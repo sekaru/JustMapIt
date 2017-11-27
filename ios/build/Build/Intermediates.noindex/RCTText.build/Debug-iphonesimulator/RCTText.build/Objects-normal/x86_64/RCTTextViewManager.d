@@ -1,0 +1,35 @@
+dependencies: \
+  /Users/tudor/Documents/JustMapIt/node_modules/react-native/Libraries/Text/RCTTextViewManager.m \
+  /Users/tudor/Documents/JustMapIt/node_modules/react-native/Libraries/Text/RCTTextViewManager.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTViewManager.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTBridgeModule.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTDefines.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTConvert.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTAnimationType.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTBorderStyle.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTLog.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTAssert.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTUtils.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTPointerEvents.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTTextDecorationLineType.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/yoga/Yoga.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/yoga/YGEnums.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/yoga/YGMacros.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTEventDispatcher.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTBridge.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTBridgeDelegate.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTJavaScriptLoader.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTFrameUpdate.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTInvalidating.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/UIView+React.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTComponent.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTFont.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTShadowView+Layout.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTShadowView.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTRootView.h \
+  /Users/tudor/Documents/JustMapIt/node_modules/react-native/Libraries/Text/RCTConvert+Text.h \
+  /Users/tudor/Documents/JustMapIt/node_modules/react-native/Libraries/Text/RCTShadowTextView.h \
+  /Users/tudor/Documents/JustMapIt/node_modules/react-native/Libraries/Text/RCTTextView.h \
+  /Users/tudor/Documents/JustMapIt/ios/build/Build/Products/Debug-iphonesimulator/include/React/RCTView.h \
+  /Users/tudor/Documents/JustMapIt/node_modules/react-native/Libraries/Text/RCTTextInput.h \
+  /Users/tudor/Documents/JustMapIt/node_modules/react-native/Libraries/Text/RCTBackedTextInputViewProtocol.h
