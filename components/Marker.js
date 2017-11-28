@@ -7,8 +7,8 @@ export default class Marker extends React.Component {
 
     return (
       <View style={styles.circle}>
-        {/* <Text style={styles.pinText}>{this.props.title}</Text> */}
-        <Image style={styles.image} resizeMode={'cover'} source={{uri: image}}></Image>
+        <Text style={{color: 'white'}}>{this.props.title.substring(0, 1)}</Text>
+        {/* <Image style={styles.image} resizeMode={'cover'} source={{uri: image}}></Image> */}
       </View>
     )
   }
@@ -16,15 +16,19 @@ export default class Marker extends React.Component {
 
 const styles = StyleSheet.create({
   circle: {
-    width: 60,
-    height: 60,
-    borderWidth: 3,
+    width: 40,
+    height: 40,
+    borderWidth: 2,
     borderColor: 'white',
-    borderRadius: 30
+    borderRadius: 20,
+    backgroundColor: 'purple',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden'
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: 30
+    borderRadius: 20
   }
 });

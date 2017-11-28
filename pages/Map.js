@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import MapView from 'react-native-maps';
 import Marker from '../components/Marker';
 import Callout from '../components/Callout';
+import Cards from '../components/Cards';
 
 export default class Map extends React.Component {
   constructor(props) {
@@ -17,6 +18,8 @@ export default class Map extends React.Component {
     const { width, height }  = window;
     const latitudeD = 0.0922;
     const longitudeD = latitudeD + (width / height);
+    
+    const { state } = this.props.navigation;
 
     return (
       <View style={styles.container}>
@@ -28,7 +31,7 @@ export default class Map extends React.Component {
             longitudeDelta: longitudeD,
           }}
           style={styles.map}
-          onPress={e => this.addMarker2(e)}
+          onPress={e => this.addMarker(e)}
           showsUserLocation={true} 
           showsMyLocationButton={true}   
           showsTraffic={false}   
@@ -37,19 +40,22 @@ export default class Map extends React.Component {
         >
           {this.state.markers.map(marker => (
               <MapView.Marker
-                key={marker.latlng}
+                key={marker.latlng.latitude}
                 coordinate={marker.latlng}
                 title={marker.title}
                 description={marker.description}
-                image={marker.image}
+                // image={marker.image}
               >
-                {/* <Marker {...marker}></Marker> */}
+                <Marker {...marker} />
                 <MapView.Callout>
-                  <Callout {...marker} />
+                    <Callout {...marker} />
                 </MapView.Callout>
               </MapView.Marker>
           ))}
+
         </MapView>
+
+        <Cards lobbyCode={state.params ? state.params.lobbyCode : 'null'} />      
       </View>
     );
   }
@@ -58,14 +64,26 @@ export default class Map extends React.Component {
     let markers = this.state.markers;
     let latlng = e.nativeEvent.coordinate;
 
+    if(!this.isMarkerUnique(latlng)) return;
+
     markers.push({
-      latlng: e.nativeEvent.coordinate,
-      title: 'Yay',
+      latlng: latlng,
+      title: markers.length + '',
       description: 'This is a fairly short description',
       image: ''
     }); 
 
-    this.setState({markers});     
+    this.setState({markers});    
+  }
+
+  isMarkerUnique(latlng) {
+    for(marker in this.state.markers) {
+      if(latlng===marker.latlng) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   addMarker(e) {
@@ -86,7 +104,9 @@ export default class Map extends React.Component {
               image: result.photos ? 'https://maps.googleapis.com/maps/api/place/photo?photoreference=' + result.photos[0].photo_reference + '&maxwidth=250&key=AIzaSyBAgp3ed5PJbW9lWs6nIvWhv41KjPikYQ0' : ''
             }); 
 
-            this.setState({markers}); 
+            this.setState({markers});
+
+            
             return isPlace;
           }
         })

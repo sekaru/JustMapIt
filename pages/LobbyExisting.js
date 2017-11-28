@@ -6,7 +6,7 @@ export default class LobbyExisting extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: '',
+      text: 'CHILL',
       continueText: 'Continue'
     }
   }
@@ -19,6 +19,7 @@ export default class LobbyExisting extends React.Component {
         <View>
           <Text style={[styles.centred, styles.header]}>Let's get mapping</Text>
           <Text style={styles.centred}>Enter your 5-digit lobby code below</Text>
+          <Text> </Text>
         </View>
 
         <View style={styles.buttonsContainer}>
@@ -63,7 +64,7 @@ export default class LobbyExisting extends React.Component {
     .then((response) => response.json())
     .then((responseJson) => {
       if(responseJson.resp) {
-        navigate('Map');   
+        navigate('Map', {lobbyCode: responseJson.code});   
         Keyboard.dismiss();     
         this.setState({continueText: 'Continue'});
       } 
@@ -108,6 +109,6 @@ const styles = StyleSheet.create({
     padding: 8,
     width: '100%',
     backgroundColor: 'lightgray',
-    borderRadius: 16
+    borderRadius: 20
   }
 });

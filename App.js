@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { StackNavigator } from 'react-navigation';
+import { StackNavigator, TabNavigator } from 'react-navigation';
 import HomeScreen from './pages/Home';
 import MapScreen from './pages/Map';
 import ExistingScreen from './pages/LobbyExisting';

@@ -41,7 +41,7 @@ export default class LobbyNew extends React.Component {
 
           <Button
             style={styles.button}            
-            onPress={() => {navigate('Map')}}              
+            onPress={() => {navigate('Map', {lobbyCode: this.state.code})}}              
           >
           Continue
           </Button>
@@ -95,6 +95,6 @@ const styles = StyleSheet.create({
     padding: 8,
     width: '100%',
     backgroundColor: 'lightgray',
-    borderRadius: 16,
+    borderRadius: 20,
   }
 });

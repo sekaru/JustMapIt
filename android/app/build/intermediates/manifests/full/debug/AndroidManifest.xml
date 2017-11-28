@@ -43,6 +43,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBAgp3ed5PJbW9lWs6nIvWhv41KjPikYQ0" />
+        <meta-data
+            android:name="com.dylanvann.fastimage.OkHttpProgressGlideModule"
+            android:value="GlideModule" />
 
         <activity
             android:name="com.google.android.gms.common.api.GoogleApiActivity"
