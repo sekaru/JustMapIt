@@ -4,13 +4,31 @@ import MapView from 'react-native-maps';
 import Marker from '../components/Marker';
 import Callout from '../components/Callout';
 import Cards from '../components/Cards';
+import Toast from 'react-native-root-toast';
 
 export default class Map extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      markers: []
+      mode: 0,
+      markers: [],
+      lobbyPlaces: [],
+      tempPlaces: []
     }
+  }
+
+  componentWillMount() {
+    this.getLobbyPlaces();
+  }
+
+  getLobbyPlaces() {
+    const { state } = this.props.navigation;
+    
+    fetch('http://52.58.65.213:3000/get-places?lobby=' + state.params.lobbyCode + '&sort=1')
+    .then((response) => response.json())
+    .then((responseJson) => {
+      this.setState({lobbyPlaces: responseJson});
+    })
   }
 
   render() {
@@ -31,7 +49,7 @@ export default class Map extends React.Component {
             longitudeDelta: longitudeD,
           }}
           style={styles.map}
-          onPress={e => this.addMarker(e)}
+          onPress={e => this.tapMap(e)}
           showsUserLocation={true} 
           showsMyLocationButton={true}   
           showsTraffic={false}   
@@ -44,7 +62,6 @@ export default class Map extends React.Component {
                 coordinate={marker.latlng}
                 title={marker.title}
                 description={marker.description}
-                // image={marker.image}
               >
                 <Marker {...marker} />
                 <MapView.Callout>
@@ -55,66 +72,113 @@ export default class Map extends React.Component {
 
         </MapView>
 
-        <Cards lobbyCode={state.params ? state.params.lobbyCode : 'null'} />      
+        <Cards ref='cards' mode={this.state.mode} lobbyCode={state.params ? state.params.lobbyCode : null} tapLobbyCode={() => this.tapLobbyCode()} places={this.state.mode==0 ? this.state.lobbyPlaces : this.state.tempPlaces} />      
       </View>
     );
   }
 
-  addMarker2(e) {
-    let markers = this.state.markers;
-    let latlng = e.nativeEvent.coordinate;
-
-    if(!this.isMarkerUnique(latlng)) return;
-
-    markers.push({
-      latlng: latlng,
-      title: markers.length + '',
-      description: 'This is a fairly short description',
-      image: ''
-    }); 
-
-    this.setState({markers});    
+  radius() {
+    return '&radius=6';
   }
 
-  isMarkerUnique(latlng) {
-    for(marker in this.state.markers) {
-      if(latlng===marker.latlng) {
-        return false;
-      }
+  key() {
+    return '&key=AIzaSyBAgp3ed5PJbW9lWs6nIvWhv41KjPikYQ0';
+  }
+
+  tapLobbyCode() {
+    this.setState({mode: 0});  
+    this.showCardsIfNotShown();
+  }
+
+  showCardsIfNotShown() {
+    if(!this.refs.cards.state.show) {
+      setTimeout(() => {
+        this.refs.cards.setState({loading: false});      
+      }, 50);
+
+      this.refs.cards.toggleCards();      
+    } 
+  }
+
+  addToast(message) {
+    let toast = Toast.show(message, {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.TOP,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+    });
+  }
+
+  canTapMap() {
+    return !this.refs.cards.state.show;
+  }
+
+  tapMap(e) {
+    if(!this.canTapMap()) {
+      this.addToast('Tap the hide places button first to find new places');
+      return;
     }
 
-    return true;
-  }
-
-  addMarker(e) {
-    let markers = this.state.markers;
     let latlng = e.nativeEvent.coordinate;
+    let tempPlaces = [];    
+    this.refs.cards.setState({loading: true});
    
-    fetch('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + latlng.latitude + ',' + latlng.longitude + '&radius=2&key=AIzaSyBAgp3ed5PJbW9lWs6nIvWhv41KjPikYQ0')
+    fetch('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + latlng.latitude + ',' + latlng.longitude + this.radius() + this.key())
     .then((response) => response.json())
     .then((responseJson) => {
       if(responseJson.results.length>0) {
-        responseJson.results.some(result => {
+        let foundSomething;
+
+        responseJson.results.forEach(result => {
           let isPlace = result.types.some(r => ['bar', 'restaurant', 'food', 'point_of_interest'].indexOf(r) >= 0);
-          if(isPlace) {
-            markers.push({
-              latlng: {latitude: result.geometry.location.lat, longitude: result.geometry.location.lng},
-              title: result.name,
-              description: result.place_id,
-              image: result.photos ? 'https://maps.googleapis.com/maps/api/place/photo?photoreference=' + result.photos[0].photo_reference + '&maxwidth=250&key=AIzaSyBAgp3ed5PJbW9lWs6nIvWhv41KjPikYQ0' : ''
-            }); 
+          if(isPlace && result.photos) {
+            // markers.push({
+            //   latlng: {latitude: result.geometry.location.lat, longitude: result.geometry.location.lng},
+            //   title: result.name,
+            //   description: result.place_id,
+            //   image: result.photos ? 'https://maps.googleapis.com/maps/api/place/photo?photoreference=' + result.photos[0].photo_reference + '&maxwidth=250' + this.key() : ''
+            // }); 
+            foundSomething = true;
 
-            this.setState({markers});
-
-            
-            return isPlace;
+            this.getPlaceInfo(result.place_id)
+            .then(place => {
+              if(place.result.website) {
+                tempPlaces.push({
+                  link: place.result.website,
+                  desc: place.result.name + ' @ ' + place.result.vicinity,
+                  image: 'https://maps.googleapis.com/maps/api/place/photo?photoreference=' + result.photos[0].photo_reference + '&maxwidth=250' + this.key(),
+                  place_id: place.result.place_id,
+                  latlng: latlng,
+                  status: place.result.opening_hours.open_now ? 'Open now' : 'Closed now, usually opens at ' + place.result.opening_hours.periods[0].open.time
+                });
+                this.setState({mode: 1, tempPlaces});
+              }           
+            });
           }
-        })
-      }   
+        });
+
+        if(foundSomething) {
+          this.setState({tempPlaces});                       
+          this.showCardsIfNotShown();
+        } else {
+          this.addToast('Couldn\'t find any places!');      
+          this.refs.cards.setState({loading: false});  
+        } 
+      }  
     })
     .catch((error) => {
-      console.error(error);
+      this.addToast('Couldn\'t find any places!');      
+      this.refs.cards.setState({loading: false});  
     });
+  }
+
+  getPlaceInfo(place_id) {
+    return fetch('https://maps.googleapis.com/maps/api/place/details/json?placeid=' + place_id + this.key())
+           .then((response) => response.json())
+           .then((responseJson) => {
+              return responseJson;
+           });
   }
 }
 

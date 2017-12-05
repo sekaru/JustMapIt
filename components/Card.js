@@ -2,11 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, Dimensions, ScrollView } from 'react-native';
 import Button from 'react-native-button';
 import FastImage from 'react-native-fast-image';
-
-const { width, height } = Dimensions.get("window");
-
-const cardW = 250;
-const cardH = 300;
+import Toast from 'react-native-root-toast';
 
 export default class Card extends React.Component {
   constructor(props) {
@@ -30,27 +26,86 @@ export default class Card extends React.Component {
   }
 
   render() {
-    const { link, image, desc, latlng } = this.props;
+    const { link, image, desc, latlng, status } = this.props;
 
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, {width: this.props.cardW, height: this.props.cardH}]}>
         <FastImage
           source={{uri: image}}
           style={styles.cardImage}
-          resizeMode="cover"
+          resizeMode={'cover'}
         />
         <View style={styles.textContent}>
-          <Text numberOfLines={1} style={styles.cardtitle}>{this.toPlaceName(link)}</Text>
+          <Text numberOfLines={1} style={styles.cardtitle}>{status ? desc.split(' @ ')[0] : this.toPlaceName(link)}</Text>
+          {
+            status &&
+            <Text numberOfLines={3} style={[styles.cardStatus, {color: status==='Open now' ? 'green' : 'red'}]}>{status}</Text>          
+          }
           <Text numberOfLines={3} style={styles.cardDescription}>
-            {desc}
+            {status ? desc.split(' @ ')[1] : desc}
           </Text>
 
           <View style={{flex: 1, justifyContent: 'flex-end'}}>
-            <Button style={styles.button}>{latlng ? 'Show on Map' : 'Set Location'}</Button>            
+            <Button onPress={() => this.buttonAction()} style={styles.button}>{this.getButtonText()}</Button>            
           </View>
         </View>
       </View>    
     )
+  }
+
+  addToast(message) {
+    let toast = Toast.show(message, {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.TOP,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+    });
+  }
+
+  getButtonText() {
+    const { mode, latlng } = this.props;
+    if(mode==0) {
+      return latlng ? 'Show on Map' : 'Set Location';
+    } else {
+      return 'Add to Lobby';
+    }
+  }
+
+  buttonAction() {
+    if(this.props.mode==0) {
+      return latlng ? 'Show on Map' : 'Set Location';
+    } else {
+      this.addToLobby();
+    }
+  }
+
+  addToLobby() {
+    const { lobbyCode, link, image, desc, latlng } = this.props;
+
+    fetch('http://52.58.65.213:3000/add-place', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        lobby: lobbyCode,
+        link: link,
+        image: image,
+        author: 'Tudor',
+        price: '€0',
+        desc: desc,
+        latlng: latlng
+      })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      if(responseJson.resp) {
+        this.addToast('Successfully added ' + this.props.desc.split(' @ ')[0] + ' to your lobby!');
+      } else {
+        this.addToast('Error adding this place to your lobby!');          
+      }
+    });
   }
 }
 
@@ -59,12 +114,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     backgroundColor: 'white',
     marginLeft: 10,
-    // shadowColor: "#000",
-    // shadowRadius: 5,
-    // shadowOpacity: 0.3,
-    // shadowOffset: { x: 2, y: -2 },
-    width: cardW,    
-    height: cardH,
     overflow: 'hidden',
   },
   cardImage: {
@@ -82,6 +131,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     fontWeight: 'bold'
+  },
+  cardStatus: {
+    fontSize: 14,    
+    fontWeight: 'bold'    
   },
   cardDescription: {
     fontSize: 12,
