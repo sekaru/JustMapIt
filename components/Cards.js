@@ -17,20 +17,24 @@ export default class Cards extends React.Component {
     }
   }
 
-  componentWillMount() {
-    fetch('http://52.58.65.213:3000/get-places?lobby=' + this.props.lobbyCode + '&sort=1')
-    .then((response) => response.json())
-    .then((responseJson) => {
-      this.setState({places: responseJson, loading: false});
-    })
-  }
-
-  componentDidMount() {
+  componentWillReceiveProps(props) {
+    if(props.places.length==0) {
+      this.setState({show: false});
+    }
+    this.setState({loading: false});
   }
 
   toCard(place) {
     return (
-      <Card key={place.link} {...place} lobbyCode={this.props.lobbyCode} cardW={cardW} cardH={cardH} mode={this.props.mode} />
+      <Card 
+        key={place.link} 
+        {...place} 
+        lobbyCode={this.props.lobbyCode} 
+        cardW={cardW} 
+        cardH={cardH} 
+        mode={this.props.mode} 
+        getLobbyPlaces={this.props.getLobbyPlaces}
+        />
     )
   }
 
@@ -72,14 +76,7 @@ export default class Cards extends React.Component {
   }
 
   toggleCards() {
-    if(!this.state.show) {
-      this.setState({loading: true});
-      setTimeout(() => {
-        this.setState({show: !this.state.show, loading: false});    
-      }, 50);
-    } else {
-      this.setState({show: !this.state.show});      
-    }
+    this.setState({show: !this.state.show});      
   }
 }
 

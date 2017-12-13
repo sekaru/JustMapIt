@@ -4,7 +4,9 @@ import MapView from 'react-native-maps';
 import Marker from '../components/Marker';
 import Callout from '../components/Callout';
 import Cards from '../components/Cards';
-import Toast from 'react-native-root-toast';
+import { addToast } from '../utils/toasts';
+import * as Strings from '../utils/strings';
+import * as Config from '../utils/config';
 
 export default class Map extends React.Component {
   constructor(props) {
@@ -21,14 +23,40 @@ export default class Map extends React.Component {
     this.getLobbyPlaces();
   }
 
-  getLobbyPlaces() {
+  getLobbyPlaces(remove) {
     const { state } = this.props.navigation;
     
-    fetch('http://52.58.65.213:3000/get-places?lobby=' + state.params.lobbyCode + '&sort=1')
+    fetch(Config.serverURL + '/get-places?lobby=' + state.params.lobbyCode + '&sort=1')
     .then((response) => response.json())
     .then((responseJson) => {
       this.setState({lobbyPlaces: responseJson});
-    })
+      this.setMarkers();
+    });
+
+    // if(remove) {
+    //   let tempPlaces = this.state.tempPlaces;
+    //   let index = tempPlaces.findIndex((place) => {
+    //     if(place.link===remove) return true;
+    //   });
+
+    //   if(index!=-1) {
+    //     tempPlaces.splice(index, 1);
+    //     this.setState({tempPlaces});      
+    //   }
+    // }
+  }
+
+  setMarkers() {
+    let markers = [];
+    this.state.lobbyPlaces.forEach((place) => {
+      if(place.latlng) markers.push({
+        latlng: place.latlng,
+        title: place.link,
+        description: place.desc,
+        image: place.image
+      }); 
+    });
+    this.setState({markers});
   }
 
   render() {
@@ -72,17 +100,20 @@ export default class Map extends React.Component {
 
         </MapView>
 
-        <Cards ref='cards' mode={this.state.mode} lobbyCode={state.params ? state.params.lobbyCode : null} tapLobbyCode={() => this.tapLobbyCode()} places={this.state.mode==0 ? this.state.lobbyPlaces : this.state.tempPlaces} />      
+        <Cards 
+          ref='cards' 
+          mode={this.state.mode} 
+          lobbyCode={state.params ? state.params.lobbyCode : null} 
+          tapLobbyCode={() => this.tapLobbyCode()} 
+          places={this.state.mode==0 ? this.state.lobbyPlaces : this.state.tempPlaces} 
+          getLobbyPlaces={() => this.getLobbyPlaces()}
+          />      
       </View>
     );
   }
 
   radius() {
-    return '&radius=6';
-  }
-
-  key() {
-    return '&key=AIzaSyBAgp3ed5PJbW9lWs6nIvWhv41KjPikYQ0';
+    return '&radius=10';
   }
 
   tapLobbyCode() {
@@ -91,23 +122,10 @@ export default class Map extends React.Component {
   }
 
   showCardsIfNotShown() {
-    if(!this.refs.cards.state.show) {
-      setTimeout(() => {
-        this.refs.cards.setState({loading: false});      
-      }, 50);
-
+    if(this.canTapMap()) {
+      this.refs.cards.setState({loading: false});      
       this.refs.cards.toggleCards();      
     } 
-  }
-
-  addToast(message) {
-    let toast = Toast.show(message, {
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.TOP,
-      shadow: true,
-      animation: true,
-      hideOnPress: true,
-    });
   }
 
   canTapMap() {
@@ -116,65 +134,62 @@ export default class Map extends React.Component {
 
   tapMap(e) {
     if(!this.canTapMap()) {
-      this.addToast('Tap the hide places button first to find new places');
+      addToast('Tap the hide places button first to find new places');
       return;
     }
 
     let latlng = e.nativeEvent.coordinate;
     let tempPlaces = [];    
     this.refs.cards.setState({loading: true});
-   
-    fetch('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + latlng.latitude + ',' + latlng.longitude + this.radius() + this.key())
+
+    let url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + latlng.latitude + ',' + latlng.longitude + this.radius() + Config.googleKey;
+
+    fetch(url)
     .then((response) => response.json())
     .then((responseJson) => {
       if(responseJson.results.length>0) {
-        let foundSomething;
+        // handle not finding anything
+        let notFound = setTimeout(() => {
+          this.handleCouldntFindPlace();
+        }, 1500);
 
         responseJson.results.forEach(result => {
           let isPlace = result.types.some(r => ['bar', 'restaurant', 'food', 'point_of_interest'].indexOf(r) >= 0);
           if(isPlace && result.photos) {
-            // markers.push({
-            //   latlng: {latitude: result.geometry.location.lat, longitude: result.geometry.location.lng},
-            //   title: result.name,
-            //   description: result.place_id,
-            //   image: result.photos ? 'https://maps.googleapis.com/maps/api/place/photo?photoreference=' + result.photos[0].photo_reference + '&maxwidth=250' + this.key() : ''
-            // }); 
-            foundSomething = true;
-
             this.getPlaceInfo(result.place_id)
-            .then(place => {
+            .then(place => {       
               if(place.result.website) {
                 tempPlaces.push({
                   link: place.result.website,
                   desc: place.result.name + ' @ ' + place.result.vicinity,
-                  image: 'https://maps.googleapis.com/maps/api/place/photo?photoreference=' + result.photos[0].photo_reference + '&maxwidth=250' + this.key(),
+                  image: 'https://maps.googleapis.com/maps/api/place/photo?photoreference=' + result.photos[0].photo_reference + '&maxwidth=250' + Config.googleKey,
                   place_id: place.result.place_id,
                   latlng: latlng,
-                  status: place.result.opening_hours.open_now ? 'Open now' : 'Closed now, usually opens at ' + place.result.opening_hours.periods[0].open.time
+                  status: place.result.opening_hours.open_now ? Strings.openNow : Strings.closedNow + place.result.opening_hours.periods[0].open.time,
+                  price_level: place.result.price_level
                 });
+                
                 this.setState({mode: 1, tempPlaces});
+                this.showCardsIfNotShown();        
+                clearTimeout(notFound);  
               }           
             });
           }
         });
-
-        if(foundSomething) {
-          this.setState({tempPlaces});                       
-          this.showCardsIfNotShown();
-        } else {
-          this.addToast('Couldn\'t find any places!');      
-          this.refs.cards.setState({loading: false});  
-        } 
       }  
     })
     .catch((error) => {
-      this.addToast('Couldn\'t find any places!');      
-      this.refs.cards.setState({loading: false});  
+      this.handleCouldntFindPlace();
     });
   }
 
+  handleCouldntFindPlace() {
+    addToast('Couldn\'t find any places!');      
+    this.refs.cards.setState({loading: false});  
+  }
+
   getPlaceInfo(place_id) {
-    return fetch('https://maps.googleapis.com/maps/api/place/details/json?placeid=' + place_id + this.key())
+    return fetch('https://maps.googleapis.com/maps/api/place/details/json?placeid=' + place_id + Config.googleKey)
            .then((response) => response.json())
            .then((responseJson) => {
               return responseJson;

@@ -1,14 +1,16 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import Button from 'react-native-button';
+import { toPlaceName } from '../utils/utilFunctions';
 
 export default class Callout extends React.Component {
   render() {
+    const { image, title, description } = this.props;
+
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>{this.props.title}</Text>        
-        <Text style={styles.description}>{this.props.description}</Text>
-        <Button>Add to lobby</Button>
+        <Text style={styles.title}>{toPlaceName(title)}</Text>        
+        <Text style={styles.description}>{description}</Text>
       </View>
     )
   }
@@ -23,7 +25,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10
+    marginBottom: 10,
   },
   description: {
     marginBottom: 8

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { toPlaceName } from '../utils/utilFunctions';
 
 export default class Marker extends React.Component {
   render() {
@@ -8,7 +9,7 @@ export default class Marker extends React.Component {
 
     return (
       <View style={styles.circle}>
-        <Text style={{color: 'white'}}>{this.props.title.substring(0, 1)}</Text>
+        <Text style={{color: 'white'}}>{toPlaceName(this.props.title).substring(0, 1).toUpperCase()}</Text>
         {/* <FastImage style={styles.image} resizeMode={'cover'} source={{uri: image}}></FastImage> */}
       </View>
     )

@@ -2,31 +2,56 @@ import React from 'react';
 import { StyleSheet, View, Text, Dimensions, ScrollView } from 'react-native';
 import Button from 'react-native-button';
 import FastImage from 'react-native-fast-image';
-import Toast from 'react-native-root-toast';
+import { addToast } from '../utils/toasts';
+import * as Strings from '../utils/strings';
+import * as Config from '../utils/config';
+import { toPlaceName } from '../utils/utilFunctions';
 
 export default class Card extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      added: false
+    }
   }
 
-  toPlaceName(link) {
-    let trimmedLink = link;
-    if(trimmedLink.startsWith("http://")) {
-      trimmedLink = trimmedLink.substring(7);
-    } else if(trimmedLink.startsWith("https://")) {
-      trimmedLink = trimmedLink.substring(8);
+  renderPriceAuthor() {
+    const { price_level, price, author } = this.props;
+
+    return (
+      <View style={{marginTop: 5}}>
+        {
+          author &&
+          <Text style={styles.cardInfo}>Added by {author}</Text>        
+        }
+        <Text numberOfLines={3} style={styles.cardInfo}>
+          {
+            price_level ? 
+              this.priceScale(price_level).split('Scale')[1]
+              : 
+              price && price.contains('Scale') ? price.split('Scale')[1] : price
+          }
+        </Text>
+      </View>
+    )
+  }
+
+  renderButton() {
+    const { mode } = this.props;
+
+    if((mode==1 && !this.state.added) || mode==0) {
+      return (
+        <View style={{flex: 1, justifyContent: 'flex-end'}}>
+          <Button onPress={() => this.buttonAction()} style={styles.button}>{this.getButtonText()}</Button>            
+        </View>
+      )
+    } else {
+      return null;
     }
-
-    if(trimmedLink.startsWith("www.")) trimmedLink = trimmedLink.substring(4);
-    let dot = trimmedLink.indexOf(".");
-    if(dot!==-1) trimmedLink = trimmedLink.substring(0, dot);
-    trimmedLink = trimmedLink.replace("-", " ");
-
-    return trimmedLink.toUpperCase();
   }
 
   render() {
-    const { link, image, desc, latlng, status } = this.props;
+    const { link, image, desc, latlng, status, mode } = this.props;
 
     return (
       <View style={[styles.card, {width: this.props.cardW, height: this.props.cardH}]}>
@@ -36,54 +61,63 @@ export default class Card extends React.Component {
           resizeMode={'cover'}
         />
         <View style={styles.textContent}>
-          <Text numberOfLines={1} style={styles.cardtitle}>{status ? desc.split(' @ ')[0] : this.toPlaceName(link)}</Text>
+          <Text numberOfLines={1} style={styles.cardtitle}>{status ? desc.split(' @ ')[0] : toPlaceName(link)}</Text>
+          
           {
             status &&
-            <Text numberOfLines={3} style={[styles.cardStatus, {color: status==='Open now' ? 'green' : 'red'}]}>{status}</Text>          
+            <Text numberOfLines={3} style={[styles.cardStatus, {color: status===Strings.openNow ? 'green' : 'red'}]}>{this.getStatus(status)}</Text>          
           }
+
           <Text numberOfLines={3} style={styles.cardDescription}>
             {status ? desc.split(' @ ')[1] : desc}
           </Text>
 
-          <View style={{flex: 1, justifyContent: 'flex-end'}}>
-            <Button onPress={() => this.buttonAction()} style={styles.button}>{this.getButtonText()}</Button>            
-          </View>
+          {this.renderPriceAuthor()}
+          {this.renderButton()}          
         </View>
       </View>    
     )
   }
 
-  addToast(message) {
-    let toast = Toast.show(message, {
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.TOP,
-      shadow: true,
-      animation: true,
-      hideOnPress: true,
-    });
+  getStatus(status) {
+    if(status===Strings.openNow) return status;
+    let openingTimeArr = status.split(" ");
+    let openingTime = openingTimeArr[openingTimeArr.length-1];
+    let formattedTime = openingTime.split('')[0] + openingTime.split('')[1] + ":" + openingTime.split('')[2] + openingTime.split('')[3];
+    return Strings.closedNow + formattedTime;
   }
 
   getButtonText() {
     const { mode, latlng } = this.props;
     if(mode==0) {
-      return latlng ? 'Show on Map' : 'Set Location';
+      return latlng ? Strings.showOnMap : Strings.setLocation;
     } else {
-      return 'Add to Lobby';
+      return Strings.addToLobby;
     }
   }
 
   buttonAction() {
-    if(this.props.mode==0) {
-      return latlng ? 'Show on Map' : 'Set Location';
+    const { mode, latlng } = this.props;
+    
+    if(mode==0) {
+      return latlng ? this.showOnMap() : this.setLocation();
     } else {
       this.addToLobby();
     }
   }
 
-  addToLobby() {
-    const { lobbyCode, link, image, desc, latlng } = this.props;
+  showOnMap() {
 
-    fetch('http://52.58.65.213:3000/add-place', {
+  }
+
+  setLocation() {
+
+  }
+
+  addToLobby() {
+    const { lobbyCode, link, image, desc, latlng, price_level, getLobbyPlaces } = this.props;
+
+    fetch(Config.serverURL + '/add-place', {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -93,7 +127,7 @@ export default class Card extends React.Component {
         link: link,
         image: image,
         author: 'Tudor',
-        price: '€0',
+        price: price_level ? this.priceScale(price_level) : '€0',
         desc: desc,
         latlng: latlng
       })
@@ -101,11 +135,19 @@ export default class Card extends React.Component {
     .then((response) => response.json())
     .then((responseJson) => {
       if(responseJson.resp) {
-        this.addToast('Successfully added ' + this.props.desc.split(' @ ')[0] + ' to your lobby!');
+        this.setState({added: true});
+        addToast('Successfully added ' + desc.split(' @ ')[0] + ' to your lobby!');
+        getLobbyPlaces();
       } else {
-        this.addToast('Error adding this place to your lobby!');          
+        addToast('Error adding this place to your lobby!');          
       }
     });
+  }
+
+  priceScale(price_level) {
+    let scale = 'Scale';
+    for(let i=0; i<price_level+1; i++) scale+='€';
+    return scale;
   }
 }
 
@@ -139,6 +181,10 @@ const styles = StyleSheet.create({
   cardDescription: {
     fontSize: 12,
     color: '#444',
+  },
+  cardInfo: {
+    fontSize: 12,
+    color: '#666',      
   },
   button: {
     color: 'orange'

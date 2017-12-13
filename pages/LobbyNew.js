@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput } from 'react-native';
 import Button from 'react-native-button';
+import * as Config from '../utils/config';
 
 export default class LobbyNew extends React.Component {
   constructor(props) {
@@ -13,10 +14,30 @@ export default class LobbyNew extends React.Component {
   }
 
   fetchCode() {
-    fetch('http://52.58.65.213:3000/lobby-code')
+    fetch(Config.serverURL + '/lobby-code')
     .then((response) => response.json())
     .then((responseJson) => {
       this.setState({code: responseJson.code});
+    })
+  }
+
+  makeLobby() {
+    const { navigate } = this.props.navigation;
+    
+    fetch(Config.serverURL + '/make-lobby', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id: this.state.code
+      })
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      if(responseJson.resp) {
+        navigate('Map', {lobbyCode: this.state.code});
+      }
     })
   }
 
@@ -41,7 +62,7 @@ export default class LobbyNew extends React.Component {
 
           <Button
             style={styles.button}            
-            onPress={() => {navigate('Map', {lobbyCode: this.state.code})}}              
+            onPress={() => {this.makeLobby()}}              
           >
           Continue
           </Button>

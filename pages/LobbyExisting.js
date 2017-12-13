@@ -1,12 +1,14 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Keyboard } from 'react-native';
 import Button from 'react-native-button';
+import * as Config from '../utils/config';
+import { addToast } from '../utils/toasts';
 
 export default class LobbyExisting extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: 'CHILL',
+      text: '',
       continueText: 'Continue'
     }
   }
@@ -31,6 +33,7 @@ export default class LobbyExisting extends React.Component {
               maxLength={5}
               underlineColorAndroid={'lightgray'}
               autoCapitalize={'characters'}
+              autoCorrect={false}
             />
           </View>
 
@@ -60,14 +63,17 @@ export default class LobbyExisting extends React.Component {
 
     this.setState({continueText: 'Loading...'});
 
-    fetch('http://52.58.65.213:3000/lobby?id=' + this.state.text)
+    fetch(Config.serverURL + '/lobby?id=' + this.state.text)
     .then((response) => response.json())
     .then((responseJson) => {
       if(responseJson.resp) {
         navigate('Map', {lobbyCode: responseJson.code});   
-        Keyboard.dismiss();     
-        this.setState({continueText: 'Continue'});
-      } 
+      } else {
+        addToast(responseJson.msg);
+      }
+
+      Keyboard.dismiss();     
+      this.setState({continueText: 'Continue'});
     })    
   }
 }
