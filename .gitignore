@@ -43,6 +43,7 @@ buck-out
 local.properties
 *.iml
 /android/
+*.keystore
 
 # Node
 node_modules
