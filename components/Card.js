@@ -5,7 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { addToast } from '../utils/toasts';
 import * as Strings from '../utils/strings';
 import * as Config from '../utils/config';
-import { toPlaceName } from '../utils/utilFunctions';
+import { toPlaceName } from '../utils/helpers';
 
 export default class Card extends React.Component {
   constructor(props) {

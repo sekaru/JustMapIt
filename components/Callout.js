@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import Button from 'react-native-button';
-import { toPlaceName } from '../utils/utilFunctions';
+import { toPlaceName } from '../utils/helpers';
 
 export default class Callout extends React.Component {
   render() {

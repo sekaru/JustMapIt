@@ -1,15 +1,32 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Keyboard } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Keyboard, AsyncStorage, ScrollView } from 'react-native';
 import Button from 'react-native-button';
 import * as Config from '../utils/config';
 import { addToast } from '../utils/toasts';
+import { saveCurrLobby } from '../utils/helpers';
 
 export default class LobbyExisting extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       text: '',
-      continueText: 'Continue'
+      continueText: 'Continue',
+      prevLobbies: []
+    }
+  }
+
+  componentDidMount() {
+    this.getPrevLobbies();    
+  }
+
+  async getPrevLobbies() {
+    try {
+      const value = await AsyncStorage.getItem('prevLobbies');
+      if(value!==null) {
+        this.setState({prevLobbies: JSON.parse(value).lobbies})
+      }
+    } catch(error) {
+      console.warn(error);
     }
   }
 
@@ -53,9 +70,32 @@ export default class LobbyExisting extends React.Component {
             {this.state.continueText}
             </Button>
           }
+
+          {
+            this.state.prevLobbies.length>0 &&
+            <View style={styles.prevLobbies}>
+              <Text style={styles.prevLobbiesHeader}>Previous Lobbies</Text>          
+              <View style={{height: 140}}>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  {this.state.prevLobbies.map(this.toPrevLobbyButton)}
+                </ScrollView>
+              </View>
+            </View>
+          }
+          
         </View>
       </View>
     );
+  }
+
+  toPrevLobbyButton = (prevLobby) => {
+    return (
+      <Button key={prevLobby} 
+              style={styles.prevLobby} 
+              onPress={() => {this.setState({text: prevLobby}, this.continuePress)}}>
+        {prevLobby}
+      </Button>                        
+    )
   }
 
   continuePress() {
@@ -68,6 +108,8 @@ export default class LobbyExisting extends React.Component {
     .then((responseJson) => {
       if(responseJson.resp) {
         navigate('Map', {lobbyCode: responseJson.code});   
+
+        saveCurrLobby(responseJson.code);        
       } else {
         addToast(responseJson.msg);
       }
@@ -116,5 +158,24 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'lightgray',
     borderRadius: 20
+  },
+  prevLobbies: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 30,
+  },
+  prevLobbiesHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 5
+  },
+  prevLobby: {
+    fontSize: 16,
+    marginVertical: 5,
+    backgroundColor: 'orange',
+    color: 'white',
+    width: 160,
+    padding: 8,
+    borderRadius: 4
   }
 });

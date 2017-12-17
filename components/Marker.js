@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { toPlaceName } from '../utils/utilFunctions';
+import { toPlaceName } from '../utils/helpers';
 
 export default class Marker extends React.Component {
   render() {
