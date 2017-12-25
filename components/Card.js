@@ -29,7 +29,7 @@ export default class Card extends React.Component {
             price_level ? 
               this.priceScale(price_level).split('Scale')[1]
               : 
-              price && price.contains('Scale') ? price.split('Scale')[1] : price
+              price && price.indexOf('Scale') !=-1 ? price.split('Scale')[1] : price
           }
         </Text>
       </View>

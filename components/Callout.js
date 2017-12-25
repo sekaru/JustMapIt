@@ -6,11 +6,12 @@ import { toPlaceName } from '../utils/helpers';
 export default class Callout extends React.Component {
   render() {
     const { image, title, description } = this.props;
-
+      
     return (
       <View style={styles.container}>
         <Text style={styles.title}>{toPlaceName(title)}</Text>        
         <Text style={styles.description}>{description}</Text>
+        <Button>Close</Button>        
       </View>
     )
   }
