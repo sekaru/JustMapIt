@@ -107,7 +107,7 @@ export default class Card extends React.Component {
   }
 
   showOnMap() {
-
+    this.props.showOnMap();
   }
 
   setLocation() {

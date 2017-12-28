@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
 import Button from 'react-native-button';
 import Card from './Card';
+import * as Strings from '../utils/strings';
 
 const { width, height } = Dimensions.get("window");
 
@@ -67,7 +68,7 @@ export default class Cards extends React.Component {
             <Button onPress={() => this.toggleCards()} 
                     style={styles.toggleButton}
             >
-              {this.state.show ? 'Hide Places' : 'Show Places'}
+              {this.state.show ? Strings.hidePlaces : Strings.showPlaces}
             </Button>   
           }  
         </View>

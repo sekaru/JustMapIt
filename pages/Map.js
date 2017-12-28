@@ -15,7 +15,8 @@ export default class Map extends React.Component {
       mode: 0,
       markers: [],
       lobbyPlaces: [],
-      tempPlaces: []
+      tempPlaces: [],
+      showOnMapRef: null
     }
   }
 
@@ -29,21 +30,28 @@ export default class Map extends React.Component {
     fetch(Config.serverURL + '/get-places?lobby=' + state.params.lobbyCode + '&sort=1')
     .then((response) => response.json())
     .then((responseJson) => {
+      responseJson.forEach(place => {
+        place.showOnMap = () => {
+          // show callout
+          let markerRef = 'marker' + JSON.stringify(place.latlng);
+          this.setState({showOnMapRef: markerRef});
+
+          // focus on them
+          this.refs.map.animateToRegion({
+            latitude: place.latlng.latitude,
+            longitude: place.latlng.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }, 200);
+
+          // hide cards
+          this.refs.cards.toggleCards();                
+        }
+      });
+
       this.setState({lobbyPlaces: responseJson});
       this.setMarkers();
     });
-
-    // if(remove) {
-    //   let tempPlaces = this.state.tempPlaces;
-    //   let index = tempPlaces.findIndex((place) => {
-    //     if(place.link===remove) return true;
-    //   });
-
-    //   if(index!=-1) {
-    //     tempPlaces.splice(index, 1);
-    //     this.setState({tempPlaces});      
-    //   }
-    // }
   }
 
   setMarkers() {
@@ -59,6 +67,13 @@ export default class Map extends React.Component {
     this.setState({markers});
   }
 
+  onRegionChangeComplete() {
+    if(this.refs[this.state.showOnMapRef]) {
+      this.refs[this.state.showOnMapRef].showCallout();
+      this.setState({showOnMapRef: null});
+    }
+  }
+
   render() {
     const window = Dimensions.get('window');
     const { width, height }  = window;
@@ -70,6 +85,7 @@ export default class Map extends React.Component {
     return (
       <View style={styles.container}>
         <MapView
+          ref='map'
           initialRegion={{
             latitude: 51.509865,
             longitude: -0.118092,
@@ -78,6 +94,7 @@ export default class Map extends React.Component {
           }}
           style={styles.map}
           onPress={e => this.tapMap(e)}
+          onRegionChangeComplete={() => this.onRegionChangeComplete()}
           showsUserLocation={true} 
           showsMyLocationButton={true}   
           showsTraffic={false}   
@@ -90,9 +107,10 @@ export default class Map extends React.Component {
                 coordinate={marker.latlng}
                 title={marker.title}
                 description={marker.description}
+                ref={'marker' + JSON.stringify(marker.latlng)}
               >
                 <Marker {...marker} />
-                <MapView.Callout>
+                <MapView.Callout onPress={() => {this.refs['marker' + JSON.stringify(marker.latlng)].hideCallout()}}>
                     <Callout {...marker} />
                 </MapView.Callout>
               </MapView.Marker>
