@@ -1,26 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, AsyncStorage } from 'react-native';
+import { StyleSheet, Text, View, TextInput } from 'react-native';
 import Button from 'react-native-button';
 
 export default class Home extends React.Component {
   constructor(props) {
     super(props);
-  }
-
-  componentDidMount() {
-    this.checkCurrLobby();    
-  }
-
-  async checkCurrLobby() {
-    try {
-      const value = await AsyncStorage.getItem('currLobby');
-      if (value !== null) {
-        const { navigate } = this.props.navigation;
-        navigate('Map', {lobbyCode: value});           
-      }
-    } catch (error) {
-      console.warn(error)
-    }
   }
 
   render() {

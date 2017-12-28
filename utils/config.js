@@ -1,2 +1,2 @@
-export const serverURL = "http://52.58.65.213:3000"
+export let serverURL = null;
 export const googleKey = "&key=AIzaSyBAgp3ed5PJbW9lWs6nIvWhv41KjPikYQ0"

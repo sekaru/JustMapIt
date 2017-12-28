@@ -111,7 +111,7 @@ export default class Card extends React.Component {
   }
 
   setLocation() {
-
+    this.props.setLocation();
   }
 
   addToLobby() {
