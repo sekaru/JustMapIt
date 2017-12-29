@@ -7,6 +7,8 @@ import MapScreen from './pages/Map';
 import ExistingScreen from './pages/LobbyExisting';
 import NewScreen from './pages/LobbyNew';
 import LobbyViewScreen from './pages/LobbyView';
+import WhoScreen from './pages/Who';
+import RegisterScreen from './pages/Register';
 import * as Config from './utils/config';
 
 const ScreenNavigator = StackNavigator({
@@ -15,7 +17,9 @@ const ScreenNavigator = StackNavigator({
   ExistingLobby: { screen: ExistingScreen },
   NewLobby: { screen: NewScreen },
   Map: { screen: MapScreen },
-  LobbyView: { screen: LobbyViewScreen }
+  LobbyView: { screen: LobbyViewScreen },
+  Who: { screen: WhoScreen },
+  Register: { screen: RegisterScreen }
 }, {
   // tabBarPosition: 'bottom',
   // tabBarOptions: {
@@ -50,21 +54,24 @@ export default class App extends React.Component {
       .then((response) => response.text())
       .then((responseText) => {
         Config.serverURL = 'http://' + responseText;
-        this.checkCurrLobby();
+        this.checkSavedLogin();
         this.setState({loading: false});         
       });
     });
   }
 
-  async checkCurrLobby() {
+  async checkSavedLogin() {
     try {
-      const value = await AsyncStorage.getItem('currLobby');
+      const value = await AsyncStorage.getItem('savedLogin');
       if (value !== null) {
+        let parsedVal = JSON.parse(value);
+
         this.refs.nav.dispatch(
           NavigationActions.navigate({
             routeName: 'Map',
             params: {
-              lobbyCode: value
+              user: parsedVal.user,
+              cookie: true
             }
           })
         );

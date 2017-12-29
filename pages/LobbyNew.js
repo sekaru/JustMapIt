@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, Text, View, TextInput } from 'react-native';
 import Button from 'react-native-button';
 import * as Config from '../utils/config';
-import { saveCurrLobby } from '../utils/helpers';
 
 export default class LobbyNew extends React.Component {
   constructor(props) {
@@ -37,8 +36,7 @@ export default class LobbyNew extends React.Component {
     .then((response) => response.json())
     .then((responseJson) => {
       if(responseJson.resp) {
-        navigate('Map', {lobbyCode: this.state.code});
-        saveCurrLobby(this.state.code);
+        navigate('Who', {lobbyCode: this.state.code});
       }
     })
   }

@@ -16,10 +16,10 @@ export const toPlaceName = (link) => {
   return trimmedLink.toUpperCase();
 }
 
-export const saveCurrLobby = async (code) => {
+export const saveLogin = async (data) => {
   try {
-    await AsyncStorage.setItem('currLobby', code);
-    updatePrevLobbies(code);
+    await AsyncStorage.setItem('savedLogin', JSON.stringify(data));
+    updatePrevLobbies(data.lobbyCode);
   } catch(error) {
     console.warn(error);
   }

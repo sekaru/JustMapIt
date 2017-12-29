@@ -124,7 +124,7 @@ export default class Card extends React.Component {
   }
 
   addToLobby() {
-    const { lobbyCode, link, image, desc, latlng, price_level, getLobbyPlaces } = this.props;
+    const { lobbyCode, link, image, desc, latlng, price_level, getLobbyPlaces, name } = this.props;
 
     fetch(Config.serverURL + '/add-place', {
       method: "POST",
@@ -135,7 +135,7 @@ export default class Card extends React.Component {
         lobby: lobbyCode,
         link: link,
         image: image,
-        author: 'Tudor',
+        author: name,
         price: price_level ? this.priceScale(price_level) : '€0',
         desc: desc,
         latlng: latlng

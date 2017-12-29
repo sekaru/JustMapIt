@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, Dimensions, Alert } from 'react-native';
 import MapView from 'react-native-maps';
+import PaddedMapView from '../components/PaddedMapView';
 import Marker from '../components/Marker';
 import Callout from '../components/Callout';
 import Cards from '../components/Cards';
@@ -31,10 +32,16 @@ export default class Map extends React.Component {
     this.getLobbyPlaces();
   }
 
+  componentDidMount() {
+    const { state } = this.props.navigation;
+
+    if(state.params.cookie) addToast("Welcome back " + state.params.user.name + "!");
+  }
+
   getLobbyPlaces(remove) {
     const { state } = this.props.navigation;
     
-    fetch(Config.serverURL + '/get-places?lobby=' + state.params.lobbyCode + '&sort=1')
+    fetch(Config.serverURL + '/get-places?lobby=' + state.params.user.lobby + '&sort=1')
     .then((response) => response.json())
     .then((responseJson) => {
       responseJson.forEach(place => {
@@ -49,7 +56,7 @@ export default class Map extends React.Component {
 
   showOnMap(place) {
     // show callout
-    let markerRef = 'marker' + JSON.stringify(place.latlng);
+    let markerRef = 'marker' + place.link;
     this.setState({showOnMapRef: markerRef});
 
     // focus on them
@@ -58,7 +65,7 @@ export default class Map extends React.Component {
       longitude: place.latlng.longitude,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
-    }, 200);
+    }, 300);
 
     // hide cards
     this.refs.cards.toggleCards();                
@@ -78,7 +85,7 @@ export default class Map extends React.Component {
         latlng: place.latlng,
         title: place.link,
         description: place.desc,
-        image: place.image
+        place: place
       }); 
     });
     this.setState({markers});
@@ -96,7 +103,7 @@ export default class Map extends React.Component {
 
     return (
       <View style={styles.container}>
-        <MapView
+        <PaddedMapView
           ref='map'
           initialRegion={{
             latitude: 51.509865,
@@ -108,10 +115,10 @@ export default class Map extends React.Component {
           onPress={e => this.tapMap(e)}
           onRegionChangeComplete={() => this.onRegionChangeComplete()}
           showsUserLocation={true} 
-          showsMyLocationButton={true}   
-          showsTraffic={false}   
-          minZoomLevel={12}   
-          showsBuildings={false}
+          showsMyLocationButton={false}   
+          showsCompass={false}
+          showsTraffic={false}     
+          loadingEnabled={true}
         >
           {this.state.markers.map(marker => (
               <MapView.Marker
@@ -119,25 +126,25 @@ export default class Map extends React.Component {
                 coordinate={marker.latlng}
                 title={marker.title}
                 description={marker.description}
-                ref={'marker' + JSON.stringify(marker.latlng)}
+                ref={'marker' + marker.place.link}
               >
                 <Marker {...marker} />
-                <MapView.Callout onPress={() => {this.refs['marker' + JSON.stringify(marker.latlng)].hideCallout()}}>
+                <MapView.Callout onPress={() => {this.refs['marker' + marker.place.link].hideCallout()}}>
                     <Callout {...marker} />
                 </MapView.Callout>
               </MapView.Marker>
           ))}
-
-        </MapView>
+        </PaddedMapView>
 
         <Cards 
           ref='cards' 
           mode={this.state.mode} 
           navigation={this.props.navigation}
-          lobbyCode={state.params ? state.params.lobbyCode : null} 
+          lobbyCode={state.params.user.lobby} 
           tapLobbyCode={() => this.tapLobbyCode()} 
           places={this.state.mode==0 ? this.state.lobbyPlaces : this.state.tempPlaces} 
           getLobbyPlaces={() => this.getLobbyPlaces()}
+          name={state.params.user.name}
           />      
 
         {
@@ -161,6 +168,7 @@ export default class Map extends React.Component {
   tapLobbyCode() {
     this.setState({mode: 0});  
     this.showCardsIfNotShown();
+    this.refs.map.fitToMarkers();
   }
 
   showCardsIfNotShown() {

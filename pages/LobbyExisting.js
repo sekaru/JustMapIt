@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, TextInput, Keyboard, AsyncStorage, ScrollView }
 import Button from 'react-native-button';
 import * as Config from '../utils/config';
 import { addToast } from '../utils/toasts';
-import { saveCurrLobby } from '../utils/helpers';
 
 export default class LobbyExisting extends React.Component {
   constructor(props) {
@@ -38,7 +37,6 @@ export default class LobbyExisting extends React.Component {
         <View>
           <Text style={[styles.centred, styles.header]}>Let's get mapping</Text>
           <Text style={styles.centred}>Enter your 5-digit lobby code below</Text>
-          <Text> </Text>
         </View>
 
         <View style={styles.buttonsContainer}>
@@ -107,9 +105,8 @@ export default class LobbyExisting extends React.Component {
     .then((response) => response.json())
     .then((responseJson) => {
       if(responseJson.resp) {
-        navigate('Map', {lobbyCode: responseJson.code});   
-
-        saveCurrLobby(responseJson.code);        
+        // navigate('Map', {lobbyCode: responseJson.code}); 
+        navigate('Who', {lobbyCode: responseJson.code});             
       } else {
         addToast(responseJson.msg);
       }

@@ -37,6 +37,7 @@ export default class Cards extends React.Component {
         mode={this.props.mode} 
         getLobbyPlaces={this.props.getLobbyPlaces}
         navigation={this.props.navigation}
+        name={this.props.name}
         />
     )
   }

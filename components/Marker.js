@@ -1,16 +1,32 @@
 import React from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { toPlaceName } from '../utils/helpers';
+import * as Config from '../utils/config';
 
 export default class Marker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      colour: ''
+    }
+  }
+
+  componentWillMount() {
+    let { place } = this.props;
+
+    fetch(Config.serverURL + '/get-colour?lobby=' + place.lobby + '&name=' + place.author)
+    .then((response) => response.json())
+    .then((responseJson) => {
+      this.setState({colour: responseJson.resp});   
+    });
+  }
+
   render() {
-    let { image } = this.props;
+    if(!this.state.colour) return null;
 
     return (
-      <View style={styles.circle}>
+      <View style={[styles.circle, {backgroundColor: this.state.colour}]}>
         <Text style={{color: 'white'}}>{toPlaceName(this.props.title).substring(0, 1).toUpperCase()}</Text>
-        {/* <FastImage style={styles.image} resizeMode={'cover'} source={{uri: image}}></FastImage> */}
       </View>
     )
   }
@@ -26,7 +42,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    backgroundColor: 'orange'
   },
   image: {
     width: '100%',
