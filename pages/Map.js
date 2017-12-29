@@ -27,18 +27,26 @@ export default class Map extends React.Component {
       lobbyPlaces: [],
       tempPlaces: [],
       showOnMapRef: null,
-      setLocationTarget: null
+      setLocationTarget: null,
+      getPlacesInterval: 0,
+      didFirstLobbyCheck: false
     }
   }
 
   componentWillMount() {
-    this.getLobbyPlaces();
+    this.setState({getPlacesInterval: setInterval(() => {
+     this.getLobbyPlaces();      
+    }, 5000)});
   }
 
   componentDidMount() {
     const { state } = this.props.navigation;
 
     if(state.params.cookie) addToast("Welcome back " + state.params.user.name + "!");
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.getPlacesInterval);
   }
 
   getLobbyPlaces(remove) {
@@ -52,7 +60,7 @@ export default class Map extends React.Component {
         place.setLocation = () => this.setLocation(place);
       });
 
-      this.setState({lobbyPlaces: responseJson});
+      this.setState({lobbyPlaces: responseJson, didFirstLobbyCheck: true});
       this.setMarkers();
     });
   }
@@ -121,7 +129,6 @@ export default class Map extends React.Component {
           showsMyLocationButton={false}   
           showsCompass={false}
           showsTraffic={false}     
-          loadingEnabled={true}
         >
           {this.state.markers.map(marker => (
               <MapView.Marker
@@ -148,6 +155,8 @@ export default class Map extends React.Component {
           places={this.state.mode==0 ? this.state.lobbyPlaces : this.state.tempPlaces} 
           getLobbyPlaces={() => this.getLobbyPlaces()}
           name={state.params.user.name}
+          showNoPlacesTip={this.state.lobbyPlaces.length==0 && this.state.didFirstLobbyCheck}
+          interval={this.state.getPlacesInterval}
           />      
 
         {

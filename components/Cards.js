@@ -89,9 +89,12 @@ export default class Cards extends React.Component {
               {this.state.show ? Strings.hidePlaces : Strings.showPlaces}
             </Button>   
             :
-            <View style={[styles.toggleButton, styles.tip]}>
-              <Text style={styles.tipText}>Let's find somewhere new! Tap on a place on the map to add it to your lobby</Text>
-            </View>
+            (
+              this.props.showNoPlacesTip ? 
+              <View style={[styles.toggleButton, styles.tip]}>
+                <Text style={styles.tipText}>Let's find somewhere new! Tap on a place on the map to add it to your lobby</Text>
+              </View> : null
+            )
           }  
         </View>
       </View>    
@@ -110,6 +113,7 @@ export default class Cards extends React.Component {
       'Are you sure you want to logout?',
       [
         {text: 'Yes', onPress: () => {
+          clearInterval(this.props.getPlacesInterval);
           dispatch(
             NavigationActions.reset(
               {
