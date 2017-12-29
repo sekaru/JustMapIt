@@ -7,6 +7,7 @@ import * as Strings from '../utils/strings';
 import * as Config from '../utils/config';
 import { toPlaceName } from '../utils/helpers';
 import Icon from 'react-native-vector-icons/EvilIcons'; 
+import * as Colours from '../utils/colours';
 
 export default class Card extends React.Component {
   constructor(props) {
@@ -196,6 +197,6 @@ const styles = StyleSheet.create({
     color: '#666',      
   },
   button: {
-    color: 'orange'
+    color: Colours.primary
   }
 });

@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, TextInput } from 'react-native';
 import Button from 'react-native-button';
 import * as Config from '../utils/config';
+import * as Colours from '../utils/colours';
 
 export default class LobbyNew extends React.Component {
   constructor(props) {
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 10,
     padding: 12,
-    backgroundColor: 'orange',
+    backgroundColor: Colours.primary,
     color: 'white',
     borderRadius: 6,
     width: '100%'

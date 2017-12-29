@@ -4,6 +4,8 @@ import Button from 'react-native-button';
 import * as Config from '../utils/config';
 import { addToast } from '../utils/toasts';
 import { saveLogin } from '../utils/helpers';
+import * as Colours from '../utils/colours';
+import { NavigationActions } from 'react-navigation';
 
 export default class Register extends React.Component {
   constructor(props) {
@@ -115,7 +117,21 @@ export default class Register extends React.Component {
       if(responseJson.resp) {
         Keyboard.dismiss();     
         saveLogin({user: responseJson.user, lobbyCode: state.params.lobbyCode})
-        navigate('Map', {lobbyCode: state.params.lobbyCode, user: responseJson.user});   
+
+        dispatch(
+          NavigationActions.reset(
+            {
+              index: 0,
+              actions: [
+              NavigationActions.navigate({
+                routeName: 'Map',
+                params: {
+                  user: responseJson.user
+                }
+              })
+              ]
+            })
+        );
       } else {
         addToast(responseJson.msg);          
       }
@@ -146,7 +162,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 10,
     padding: 12,
-    backgroundColor: 'orange',
+    backgroundColor: Colours.primary,
     color: 'white',
     borderRadius: 6,
     width: '100%'
@@ -175,7 +191,7 @@ const styles = StyleSheet.create({
     width: 160,
     padding: 8,
     borderRadius: 4,
-    backgroundColor: 'orange'
+    backgroundColor: Colours.primary
   },
   selectedPerson: {
     elevation: 3

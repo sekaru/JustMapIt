@@ -4,6 +4,7 @@ import Button from 'react-native-button';
 import Card from './Card';
 import * as Strings from '../utils/strings';
 import Icon from 'react-native-vector-icons/EvilIcons';
+import * as Colours from '../utils/colours';
 
 const { width, height } = Dimensions.get("window");
 
@@ -53,11 +54,11 @@ export default class Cards extends React.Component {
           </View>
 
           <View style={{marginTop: 10}}>
-            <ActivityIndicator animating={this.state.loading} size={'large'} color={'orange'}></ActivityIndicator>                                                        
+            <ActivityIndicator animating={this.state.loading} size={'large'} color={Colours.primary}></ActivityIndicator>                                                        
           </View>
 
           <View style={styles.lobbyCodeContainer}>
-            <Button onPress={() => this.openLobbyView()} style={styles.lobbyCode}>{lobbyCode}<Icon name="external-link" size={30} color="#007aff" /></Button>  
+            <Button onPress={() => this.openLobbyView()} style={styles.lobbyCode}>{lobbyCode}<Icon name="external-link" size={30} color={Colours.button} /></Button>  
           </View>
         </View>
 
@@ -90,8 +91,8 @@ export default class Cards extends React.Component {
   }
 
   openLobbyView() {
-    const { navigate, state } = this.props.navigation;
-    navigate('LobbyView', {source: 'http://justpick.it/?lobby=' + state.params.lobbyCode});
+    const { navigate } = this.props.navigation;
+    navigate('LobbyView', {source: 'http://justpick.it/?lobby=' + this.props.lobbyCode});
   }
 }
 

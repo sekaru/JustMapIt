@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, Keyboard, AsyncStorage, ScrollView }
 import Button from 'react-native-button';
 import * as Config from '../utils/config';
 import { addToast } from '../utils/toasts';
+import * as Colours from '../utils/colours';
 
 export default class LobbyExisting extends React.Component {
   constructor(props) {
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 10,
     padding: 12,
-    backgroundColor: 'orange',
+    backgroundColor: Colours.primary,
     color: 'white',
     borderRadius: 6,
     width: '100%'
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   prevLobby: {
     fontSize: 16,
     marginVertical: 5,
-    backgroundColor: 'orange',
+    backgroundColor: Colours.primary,
     color: 'white',
     width: 160,
     padding: 8,

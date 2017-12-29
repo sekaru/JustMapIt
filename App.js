@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, ActivityIndicator, AsyncStorage } from 'react-native';
+import { StyleSheet, View, Text, ActivityIndicator, AsyncStorage, Animated } from 'react-native';
 import { StackNavigator, TabNavigator, NavigationActions } from 'react-navigation';
 import LoadingScreen from './pages/Loading';
 import HomeScreen from './pages/Home';
@@ -10,6 +10,7 @@ import LobbyViewScreen from './pages/LobbyView';
 import WhoScreen from './pages/Who';
 import RegisterScreen from './pages/Register';
 import * as Config from './utils/config';
+import * as Colours from './utils/colours';
 
 const ScreenNavigator = StackNavigator({
   Loading: { screen: LoadingScreen },
@@ -38,7 +39,8 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true
+      loading: true,
+      bg: new Animated.Value(0)
     }
   }
 
@@ -54,8 +56,15 @@ export default class App extends React.Component {
       .then((response) => response.text())
       .then((responseText) => {
         Config.serverURL = 'http://' + responseText;
-        this.checkSavedLogin();
-        this.setState({loading: false});         
+
+        Animated.timing(
+          this.state.bg, {toValue: 350, duration: 2000}
+        ).start();
+
+        setTimeout(() => {
+          this.checkSavedLogin();
+          this.setState({loading: false});  
+        }, 2000);       
       });
     });
   }
@@ -67,13 +76,19 @@ export default class App extends React.Component {
         let parsedVal = JSON.parse(value);
 
         this.refs.nav.dispatch(
-          NavigationActions.navigate({
-            routeName: 'Map',
-            params: {
-              user: parsedVal.user,
-              cookie: true
-            }
-          })
+          NavigationActions.reset(
+            {
+              index: 0,
+              actions: [
+              NavigationActions.navigate({
+                routeName: 'Map',
+                params: {
+                  user: parsedVal.user,
+                  cookie: true
+                }
+              })
+              ]
+            })
         );
       } else {
         this.refs.nav.dispatch(
@@ -88,28 +103,20 @@ export default class App extends React.Component {
   }
 
   render() {
+    let color = this.state.bg.interpolate({
+        inputRange: [0, 50, 100, 150, 200, 250, 300, 350],
+        outputRange: [Colours.primary, 'hsl(0, 80%, 60%)', 'hsl(330, 80%, 60%)', 'hsl(300, 80%, 60%)', 'hsl(330, 80%, 60%)', 'hsl(0, 80%, 60%)', Colours.primary, 'rgba(255,255,255,0)']
+    });
+    
     return (
       !this.state.loading ? 
-      <ScreenNavigator ref='nav' onNavigationStateChange={this.navChange.bind(this)} />
+      <ScreenNavigator ref='nav' />
       :
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Text style={{fontSize: 28, marginBottom: 5}}>Just Map It</Text>
-        <ActivityIndicator color={'orange'} animating={true} size={'large'}></ActivityIndicator>
-      </View>
+      <Animated.View style={[styles.container, {backgroundColor: color}]}>
+        <Text style={{fontSize: 28, marginBottom: 5, color: 'white'}}>Just Map It</Text>
+        <ActivityIndicator color={'white'} animating={true} size={'large'}></ActivityIndicator>
+      </Animated.View>
     );
-  }
-
-  navChange(prevState, newState, action) {
-    if(newState.routes[newState.index].routeName==='Loading') {
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [
-          NavigationActions.navigate({ routeName: 'Home'})
-        ]
-      });
-
-      this.refs.nav.dispatch(resetAction);
-    }
   }
 }
 
@@ -118,5 +125,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: Colours.primary
   }
 })

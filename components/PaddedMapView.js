@@ -17,7 +17,7 @@ export default class PaddedMapView extends React.Component {
     )
     const options = {
       edgePadding: EDGE_PADDING,
-      animated: false // optional
+      animated: true
     }
     this.ref.fitToCoordinates(markers, options)
   }
