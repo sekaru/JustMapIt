@@ -2,7 +2,9 @@
 
 A [JustPick.it](https://github.com/sekaru/justpickit) mobile companion app allowing you to add places to your lobby by tapping on them in a Google Maps interface
 
-## Other features
+![JustMapIt](https://s17.postimg.org/719fzt0hr/jmi4.png)
+
+## Features
 * See places in your JustPick.it library on the map
 * See opening hours of places
 * See price scales of places
