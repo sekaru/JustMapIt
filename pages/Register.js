@@ -92,7 +92,7 @@ export default class Register extends React.Component {
   }
 
   continuePress() {
-    const { navigate, state } = this.props.navigation;
+    const { navigate, state, dispatch } = this.props.navigation;
 
     if(this.state.pass!==this.state.pass2) {
       addToast('Those passwords don\'t match!');

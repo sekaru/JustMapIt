@@ -82,12 +82,16 @@ export default class Cards extends React.Component {
 
         <View style={styles.toggleButtonContainer}>
           {
-            !this.state.loading && places.length>0 && 
+            !this.state.loading && places.length>0 ? 
             <Button onPress={() => this.toggleCards()} 
                     style={styles.toggleButton}
             >
               {this.state.show ? Strings.hidePlaces : Strings.showPlaces}
             </Button>   
+            :
+            <View style={[styles.toggleButton, styles.tip]}>
+              <Text style={styles.tipText}>Let's find somewhere new! Tap on a place on the map to add it to your lobby</Text>
+            </View>
           }  
         </View>
       </View>    
@@ -154,7 +158,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',   
   },
   loadingBg: {
-    width: '12%',
+    width: '20%',
     flex: 1
   },
   scrollViewContainer: {
@@ -174,5 +178,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: 'rgba(255,255,255,0.8)',
     padding: 10
+  },
+  tip: {
+    width: width-20,
+    marginLeft: 10,
+  },
+  tipText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center'
   }
 });
