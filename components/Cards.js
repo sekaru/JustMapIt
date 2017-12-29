@@ -1,10 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, Text, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import Button from 'react-native-button';
 import Card from './Card';
 import * as Strings from '../utils/strings';
-import Icon from 'react-native-vector-icons/EvilIcons';
+import EvilIcon from 'react-native-vector-icons/EvilIcons';
+import SimpleLineIcon from 'react-native-vector-icons/SimpleLineIcons';
 import * as Colours from '../utils/colours';
+import { NavigationActions } from 'react-navigation';
 
 const { width, height } = Dimensions.get("window");
 
@@ -48,18 +50,24 @@ export default class Cards extends React.Component {
 
     return (
       <View style={{alignItems: 'center'}}>
-        <View style={{width: width-12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+        <View style={styles.topBar}>
           <View style={styles.lobbyCodeContainer}>
             <Button onPress={tapLobbyCode} disabled={mode==0} style={styles.lobbyCode}>Show Lobby</Button>  
           </View>
 
-          <View style={{marginTop: 10}}>
-            <ActivityIndicator animating={this.state.loading} size={'large'} color={Colours.primary}></ActivityIndicator>                                                        
+          <View style={[styles.lobbyCodeContainer, styles.loadingBg]}>
+            <Button onPress={() => this.logout()}>
+              <SimpleLineIcon name="logout" size={18} color={Colours.button} />              
+            </Button>
           </View>
 
           <View style={styles.lobbyCodeContainer}>
-            <Button onPress={() => this.openLobbyView()} style={styles.lobbyCode}>{lobbyCode}<Icon name="external-link" size={30} color={Colours.button} /></Button>  
+            <Button onPress={() => this.openLobbyView()} style={styles.lobbyCode}>{lobbyCode}<EvilIcon name="external-link" size={30} color={Colours.button} /></Button>  
           </View>
+        </View>
+
+        <View style={{marginTop: 10}}>
+          <ActivityIndicator animating={this.state.loading} size={'large'} color={Colours.primary}></ActivityIndicator>                                                        
         </View>
 
         <ScrollView
@@ -90,6 +98,32 @@ export default class Cards extends React.Component {
     this.setState({show: !this.state.show});      
   }
 
+  logout() {
+    const { dispatch } = this.props.navigation;
+
+    Alert.alert(
+    'Logout', 
+      'Are you sure you want to logout?',
+      [
+        {text: 'Yes', onPress: () => {
+          dispatch(
+            NavigationActions.reset(
+              {
+                index: 0,
+                actions: [
+                NavigationActions.navigate({
+                  routeName: 'Home',
+                })
+                ]
+              })
+          );
+        }},
+        {text: 'No'},
+      ],
+      { cancelable: true }
+    )
+  }
+
   openLobbyView() {
     const { navigate } = this.props.navigation;
     navigate('LobbyView', {source: 'http://justpick.it/?lobby=' + this.props.lobbyCode});
@@ -97,22 +131,31 @@ export default class Cards extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  lobbyCodeContainer: {
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.6)',
-    padding: 10,
+  topBar: {
     marginTop: 10,
+    marginLeft: 10,
+    width: width-20, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: 'rgba(255,255,255,0.8)',
     alignSelf: 'flex-start',
-    flexDirection: 'row',
+    flexDirection: 'row',   
+    justifyContent: 'center',
+    borderRadius: 6
+  },
+  lobbyCodeContainer: {
     width: '40%',
+    flexDirection: 'row',        
     justifyContent: 'center'
   },
   lobbyCode: {
     fontWeight: 'bold',   
   },
   loadingBg: {
-    padding: 5, 
-    borderRadius: 30
+    width: '12%',
+    flex: 1
   },
   scrollViewContainer: {
     paddingRight: 10,
@@ -125,10 +168,11 @@ const styles = StyleSheet.create({
   toggleButtonContainer: {
     flex: 1,
     justifyContent: 'center',  
+    elevation: 4    
   },
   toggleButton: {
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.6)',
+    borderRadius: 6,
+    backgroundColor: 'rgba(255,255,255,0.8)',
     padding: 10
   }
 });

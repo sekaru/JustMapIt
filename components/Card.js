@@ -163,7 +163,7 @@ export default class Card extends React.Component {
 
 const styles = StyleSheet.create({
   card: {
-    elevation: 2,
+    elevation: 4,
     backgroundColor: 'white',
     marginLeft: 10,
     overflow: 'hidden',

@@ -9,6 +9,9 @@ import { addToast } from '../utils/toasts';
 import * as Strings from '../utils/strings';
 import * as Config from '../utils/config';
 import { toPlaceName } from '../utils/helpers';
+import * as Colours from '../utils/colours';
+import Button from 'react-native-button';
+import Icon from 'react-native-vector-icons/EvilIcons';
 
 const window = Dimensions.get('window');
 const { width, height } = window;
@@ -150,7 +153,11 @@ export default class Map extends React.Component {
         {
           this.state.setLocationTarget!=null &&
           <View style={styles.setLocationTip}>
-            <Text style={styles.setLocationTipText}>Tap on the map to set this place's location</Text>
+            <Text style={styles.setLocationTipText}>Tap to set this place's location</Text>          
+            <Button onPress={() => this.setState({setLocationTarget: null})}>
+              {/* <Icon name="close" size={24} color={Colours.button} /> */}
+              Cancel
+            </Button>
           </View>
         }
       </View>
@@ -315,14 +322,16 @@ const styles = StyleSheet.create({
   setLocationTip: {
     top: 60,
     position: 'absolute',
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 20,
+    justifyContent: 'space-between',
+    borderRadius: 6,
     backgroundColor: 'rgba(255,255,255,0.8)',
     padding: 10,
     width: width-20
   },
   setLocationTipText: {
-    fontSize: 16
+    fontSize: 16,
+    fontWeight: 'bold'
   }
 });
