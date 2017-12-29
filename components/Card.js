@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, Text, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, WebView, TouchableOpacity } from 'react-native';
 import Button from 'react-native-button';
 import FastImage from 'react-native-fast-image';
 import { addToast } from '../utils/toasts';
 import * as Strings from '../utils/strings';
 import * as Config from '../utils/config';
 import { toPlaceName } from '../utils/helpers';
+import Icon from 'react-native-vector-icons/EvilIcons'; 
 
 export default class Card extends React.Component {
   constructor(props) {
@@ -50,18 +51,26 @@ export default class Card extends React.Component {
     }
   }
 
+  showWebView(link) {
+    const { navigate } = this.props.navigation;
+    navigate('LobbyView', {source: link});
+  }
+
   render() {
     const { link, image, desc, latlng, status, mode } = this.props;
 
     return (
       <View style={[styles.card, {width: this.props.cardW, height: this.props.cardH}]}>
-        <FastImage
-          source={{uri: image}}
-          style={styles.cardImage}
-          resizeMode={'cover'}
-        />
+        <TouchableOpacity style={styles.cardImage} onPress={() => this.showWebView(link)}>
+          <FastImage
+            source={{uri: image}}
+            resizeMode={'cover'}
+            style={styles.cardImage}
+          />
+        </TouchableOpacity>
+
         <View style={styles.textContent}>
-          <Text numberOfLines={1} style={styles.cardtitle}>{status ? desc.split(' @ ')[0] : toPlaceName(link)}</Text>
+          <Text numberOfLines={1} style={styles.cardtitle}>{status ? desc.split(' @ ')[0] : toPlaceName(link)}</Text>          
           
           {
             status &&

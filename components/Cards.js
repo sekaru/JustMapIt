@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, View, Text, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import Button from 'react-native-button';
 import Card from './Card';
 import * as Strings from '../utils/strings';
+import Icon from 'react-native-vector-icons/EvilIcons';
 
 const { width, height } = Dimensions.get("window");
 
@@ -35,6 +36,7 @@ export default class Cards extends React.Component {
         cardH={cardH} 
         mode={this.props.mode} 
         getLobbyPlaces={this.props.getLobbyPlaces}
+        navigation={this.props.navigation}
         />
     )
   }
@@ -44,12 +46,18 @@ export default class Cards extends React.Component {
 
     return (
       <View style={{alignItems: 'center'}}>
-        <View style={styles.lobbyCodeContainer}>
-          <Button disabled={mode==0} onPress={tapLobbyCode} style={styles.lobbyCode}>Lobby: {lobbyCode}</Button>          
-        </View>
+        <View style={{width: width-12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+          <View style={styles.lobbyCodeContainer}>
+            <Button onPress={tapLobbyCode} disabled={mode==0} style={styles.lobbyCode}>Show Lobby</Button>  
+          </View>
 
-        <View style={[{backgroundColor: this.state.loading ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0)'}, styles.loadingBg]}>
-          <ActivityIndicator animating={this.state.loading} size={'large'} color={'orange'}></ActivityIndicator>                                                        
+          <View style={{marginTop: 10}}>
+            <ActivityIndicator animating={this.state.loading} size={'large'} color={'orange'}></ActivityIndicator>                                                        
+          </View>
+
+          <View style={styles.lobbyCodeContainer}>
+            <Button onPress={() => this.openLobbyView()} style={styles.lobbyCode}>{lobbyCode}<Icon name="external-link" size={30} color="#007aff" /></Button>  
+          </View>
         </View>
 
         <ScrollView
@@ -79,6 +87,11 @@ export default class Cards extends React.Component {
   toggleCards() {
     this.setState({show: !this.state.show});      
   }
+
+  openLobbyView() {
+    const { navigate, state } = this.props.navigation;
+    navigate('LobbyView', {source: 'http://justpick.it/?lobby=' + state.params.lobbyCode});
+  }
 }
 
 const styles = StyleSheet.create({
@@ -87,8 +100,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.6)',
     padding: 10,
     marginTop: 10,
-    marginLeft: 10,
-    alignSelf: 'flex-start'
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    width: '40%',
+    justifyContent: 'center'
   },
   lobbyCode: {
     fontWeight: 'bold',   

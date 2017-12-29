@@ -133,6 +133,7 @@ export default class Map extends React.Component {
         <Cards 
           ref='cards' 
           mode={this.state.mode} 
+          navigation={this.props.navigation}
           lobbyCode={state.params ? state.params.lobbyCode : null} 
           tapLobbyCode={() => this.tapLobbyCode()} 
           places={this.state.mode==0 ? this.state.lobbyPlaces : this.state.tempPlaces} 
@@ -314,6 +315,6 @@ const styles = StyleSheet.create({
     width: width-20
   },
   setLocationTipText: {
-    fontSize: 18
+    fontSize: 16
   }
 });
