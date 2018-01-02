@@ -55,7 +55,7 @@ export default class App extends React.Component {
       fetch(responseText + '/server?id=jpi')
       .then((response) => response.text())
       .then((responseText) => {
-        Config.serverURL = 'http://' + responseText;
+        Config.serverURL = responseText;
 
         Animated.timing(
           this.state.bg, {toValue: 350, duration: 2000}
