@@ -8,7 +8,7 @@ import Cards from '../components/Cards';
 import { addToast } from '../utils/toasts';
 import * as Strings from '../utils/strings';
 import * as Config from '../utils/config';
-import { toPlaceName } from '../utils/helpers';
+import { toPlaceName, hasLatLng } from '../utils/helpers';
 import * as Colours from '../utils/colours';
 import Button from 'react-native-button';
 import Icon from 'react-native-vector-icons/EvilIcons';
@@ -49,7 +49,7 @@ export default class Map extends React.Component {
     clearInterval(this.state.getPlacesInterval);
   }
 
-  getLobbyPlaces(remove) {
+  getLobbyPlaces() {
     const { state } = this.props.navigation;
     
     fetch(Config.serverURL + '/get-places?lobby=' + state.params.user.lobby + '&sort=1')
@@ -92,7 +92,7 @@ export default class Map extends React.Component {
   setMarkers() {
     let markers = [];
     this.state.lobbyPlaces.forEach((place) => {
-      if(place.latlng) markers.push({
+      if(hasLatLng(place.latlng)) markers.push({
         latlng: place.latlng,
         title: place.link,
         description: place.desc,
@@ -199,7 +199,7 @@ export default class Map extends React.Component {
   }
 
   setNewLocation(latlng) {
-    fetch(Config.serverURL + '/set-loc', {
+    fetch(Config.serverURL + '/update-place', {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
@@ -292,7 +292,7 @@ export default class Map extends React.Component {
 
   alreadyInLobby(link) {
     return this.state.lobbyPlaces.some((place) => {
-      if(place.link===link) return true;
+      if(toPlaceName(place.link)===toPlaceName(link)) return true;
       return false;
     })
   }

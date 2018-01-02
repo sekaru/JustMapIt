@@ -106,7 +106,6 @@ export default class LobbyExisting extends React.Component {
     .then((response) => response.json())
     .then((responseJson) => {
       if(responseJson.resp) {
-        // navigate('Map', {lobbyCode: responseJson.code}); 
         navigate('Who', {lobbyCode: responseJson.code});             
       } else {
         addToast(responseJson.msg);

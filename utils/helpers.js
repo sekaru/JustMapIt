@@ -16,6 +16,10 @@ export const toPlaceName = (link) => {
   return trimmedLink.toUpperCase();
 }
 
+export const hasLatLng = (latlng) => {
+  return Object.keys(latlng).length>0;
+} 
+
 export const saveLogin = async (data) => {
   try {
     await AsyncStorage.setItem('savedLogin', JSON.stringify(data));

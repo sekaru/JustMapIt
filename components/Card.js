@@ -5,7 +5,7 @@ import FastImage from 'react-native-fast-image';
 import { addToast } from '../utils/toasts';
 import * as Strings from '../utils/strings';
 import * as Config from '../utils/config';
-import { toPlaceName } from '../utils/helpers';
+import { toPlaceName, hasLatLng } from '../utils/helpers';
 import Icon from 'react-native-vector-icons/EvilIcons'; 
 import * as Colours from '../utils/colours';
 
@@ -100,7 +100,7 @@ export default class Card extends React.Component {
   getButtonText() {
     const { mode, latlng } = this.props;
     if(mode==0) {
-      return latlng ? Strings.showOnMap : Strings.setLocation;
+      return hasLatLng(latlng) ? Strings.showOnMap : Strings.setLocation;
     } else {
       return Strings.addToLobby;
     }
@@ -110,7 +110,7 @@ export default class Card extends React.Component {
     const { mode, latlng } = this.props;
     
     if(mode==0) {
-      return latlng ? this.showOnMap() : this.setLocation();
+      return hasLatLng(latlng) ? this.showOnMap() : this.setLocation();
     } else {
       this.addToLobby();
     }
