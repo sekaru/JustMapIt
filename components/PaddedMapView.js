@@ -22,7 +22,7 @@ export default class PaddedMapView extends React.Component {
       edgePadding: EDGE_PADDING,
       animated: true
     }
-    this.ref.fitToCoordinates(markers, options)
+    this.ref.fitToCoordinates(markers, options);
   }
 
   animateToRegion = (region, speed) => {
@@ -35,7 +35,6 @@ export default class PaddedMapView extends React.Component {
         ref={(map) => {
           this.ref = map
         }}
-        onLayout={this.fitToMarkers}
         {...this.props}
       />
     )

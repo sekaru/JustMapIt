@@ -137,7 +137,7 @@ export default class Card extends React.Component {
         link: link,
         image: image,
         author: name,
-        price: price_level ? this.priceScale(price_level) : '€0',
+        price: price_level ? this.priceScale(price_level) : '£0',
         desc: desc,
         latlng: latlng
       })
@@ -156,7 +156,7 @@ export default class Card extends React.Component {
 
   priceScale(price_level) {
     let scale = 'Scale';
-    for(let i=0; i<price_level+1; i++) scale+='€';
+    for(let i=0; i<price_level+1; i++) scale+='£';
     return scale;
   }
 }

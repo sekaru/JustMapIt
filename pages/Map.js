@@ -34,9 +34,11 @@ export default class Map extends React.Component {
   }
 
   componentWillMount() {
+    this.getLobbyPlaces(true);      
+    
     this.setState({getPlacesInterval: setInterval(() => {
      this.getLobbyPlaces();      
-    }, 5000)});
+    }, 10000)});
   }
 
   componentDidMount() {
@@ -49,7 +51,7 @@ export default class Map extends React.Component {
     clearInterval(this.state.getPlacesInterval);
   }
 
-  getLobbyPlaces() {
+  getLobbyPlaces(initial) {
     const { state } = this.props.navigation;
     
     fetch(Config.serverURL + '/get-places?lobby=' + state.params.user.lobby + '&sort=1')
@@ -62,6 +64,7 @@ export default class Map extends React.Component {
 
       this.setState({lobbyPlaces: responseJson, didFirstLobbyCheck: true});
       this.setMarkers();
+      if(initial) this.refs.map.fitToMarkers();      
     });
   }
 
@@ -292,7 +295,7 @@ export default class Map extends React.Component {
 
   alreadyInLobby(link) {
     return this.state.lobbyPlaces.some((place) => {
-      if(toPlaceName(place.link)===toPlaceName(link)) return true;
+      if(toPlaceName(link)===toPlaceName(link)) return true;
       return false;
     })
   }
@@ -307,7 +310,7 @@ export default class Map extends React.Component {
            .then((response) => response.json())
            .then((responseJson) => {
               return responseJson;
-           });
+           })
   }
 }
 
