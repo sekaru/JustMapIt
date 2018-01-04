@@ -64,7 +64,7 @@ export default class Map extends React.Component {
 
       this.setState({lobbyPlaces: responseJson, didFirstLobbyCheck: true});
       this.setMarkers();
-      if(initial) this.refs.map.fitToMarkers();      
+      if(initial) setTimeout(() => this.refs.map.fitToMarkers(), 100);      
     });
   }
 
@@ -248,6 +248,10 @@ export default class Map extends React.Component {
       return;
     }
 
+    if(this.state.loading) {
+      return;
+    }
+
     let latlng = e.nativeEvent.coordinate;
     let tempPlaces = [];    
     this.refs.cards.setState({loading: true});
@@ -295,7 +299,7 @@ export default class Map extends React.Component {
 
   alreadyInLobby(link) {
     return this.state.lobbyPlaces.some((place) => {
-      if(toPlaceName(link)===toPlaceName(link)) return true;
+      if(toPlaceName(place.link)===toPlaceName(link)) return true;
       return false;
     })
   }
