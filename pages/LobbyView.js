@@ -31,7 +31,7 @@ export default class LobbyView extends React.Component {
           <Button style={{flex: 1}} onPress={() => goBack()}>
             <Icon name="close" size={24} color={Colours.button} />
           </Button>
-          <Text style={styles.link}>{source}</Text>
+          <Text numberOfLines={1} style={styles.link}>{source}</Text>
         </View>
         <WebView
           renderLoading={this.renderLoading}

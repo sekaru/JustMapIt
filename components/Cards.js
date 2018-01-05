@@ -71,6 +71,7 @@ export default class Cards extends React.Component {
         </View>
 
         <ScrollView
+          ref='scrollview'
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.scrollViewContainer}
@@ -103,6 +104,10 @@ export default class Cards extends React.Component {
 
   toggleCards() {
     this.setState({show: !this.state.show});      
+  }
+
+  scrollToStart() {
+    this.refs.scrollview.scrollTo({x: 0, y: 0, animated: true});
   }
 
   logout() {

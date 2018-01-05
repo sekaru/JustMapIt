@@ -193,7 +193,8 @@ export default class Map extends React.Component {
   showCardsIfNotShown() {
     if(this.canTapMap()) {
       this.refs.cards.setState({loading: false});      
-      this.refs.cards.toggleCards();      
+      this.refs.cards.toggleCards(); 
+      this.refs.cards.scrollToStart();     
     } 
   }
 
@@ -253,7 +254,7 @@ export default class Map extends React.Component {
     }
 
     let latlng = e.nativeEvent.coordinate;
-    let tempPlaces = [];    
+    let tempPlaces = [], numActualPlaces = 0, placesProcessed = 0;   
     this.refs.cards.setState({loading: true});
 
     let url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + latlng.latitude + ',' + latlng.longitude + this.radius() + Config.googleKey;
@@ -265,14 +266,22 @@ export default class Map extends React.Component {
         // handle not finding anything
         let notFound = setTimeout(() => {
           this.handleCouldntFindPlace();
-        }, 1500);
+        }, 2000);
 
         responseJson.results.forEach(result => {
           let isPlace = result.types.some(r => ['bar', 'restaurant', 'food', 'point_of_interest'].indexOf(r) >= 0);
           if(isPlace && result.photos) {
+            // add to the counter so we know how many places need to be processed
+            numActualPlaces++;
+
             this.getPlaceInfo(result.place_id)
-            .then(place => {       
+            .then(place => {    
+              placesProcessed++;
+
               if(place.result.website && !this.alreadyInLobby(place.result.website) && place.result.opening_hours) {
+                // we've found somewhere, clear the timer
+                clearTimeout(notFound);  
+                
                 tempPlaces.push({
                   link: place.result.website,
                   desc: place.result.name + ' @ ' + place.result.vicinity,
@@ -281,19 +290,21 @@ export default class Map extends React.Component {
                   latlng: latlng,
                   status: place.result.opening_hours.open_now ? Strings.openNow : Strings.closedNow + place.result.opening_hours.periods[0].open.time,
                   price_level: place.result.price_level
-                });
-                
+                });    
+              }    
+
+              // show all the places we've found
+              if(placesProcessed===numActualPlaces) {
                 this.setState({mode: 1, tempPlaces});
-                this.showCardsIfNotShown();        
-                clearTimeout(notFound);  
-              }           
+                this.showCardsIfNotShown(); 
+              }          
             });
           }
         });
       }  
     })
     .catch((error) => {
-      this.handleCouldntFindPlace();
+      this.handleCouldntFindPlace();                
     });
   }
 
