@@ -219,9 +219,15 @@ export default class Map extends React.Component {
       if(responseJson.resp) {
         addToast('Successfully updated the location for ' + toPlaceName(this.state.setLocationTarget.link));
         
-        this.state.setLocationTarget.latlng = latlng;
-        this.setState({setLocationTarget: null});
-        this.setMarkers();  
+        // give it a marker
+        let lobbyPlaces = this.state.lobbyPlaces;
+        lobbyPlaces.forEach(place => {
+          if(place.link===this.state.setLocationTarget.link) place.latlng = latlng;
+        });
+
+        this.setState({lobbyPlaces});
+        this.setMarkers(); 
+        this.setState({setLocationTarget: null});         
       } else {
         addToast(resp.msg);
       }
